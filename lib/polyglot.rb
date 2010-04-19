@@ -56,20 +56,3 @@ module Polyglot
     end
   end
 end
-
-module Kernel
-  alias polyglot_original_require require
-
-  def require(*a, &b)
-    polyglot_original_require(*a, &b)
-  rescue LoadError => load_error
-    begin
-      Polyglot.load(*a, &b)
-    rescue Polyglot::NestedLoadError => e
-      e.reraise
-    rescue LoadError
-      # Raise the original exception, possibly a MissingSourceFile with a path
-      raise load_error
-    end
-  end
-end
